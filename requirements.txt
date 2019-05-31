@@ -1,0 +1,4 @@
+aiohttp==3.5.4
+pytest==4.5.0
+pytest-aiohttp==0.3.0
+gino==0.8.2

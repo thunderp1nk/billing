@@ -1,0 +1,5 @@
+#
+*.pyc
+.idea/*
+.env
+.pytest_cache/*
