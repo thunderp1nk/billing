@@ -29,6 +29,7 @@ class QuotesUpload:
     quote: Decimal
 
     async def execute(self, conn):
+        # Инъекции пока не боимся, т к прошло все через датаклассы, но все равно стоит заэкскейпить все, мало ли
         # TODO: привести к алхимическому виду
         sql = f"""
             INSERT INTO {Quote.__tablename__} (currency, date, value)
