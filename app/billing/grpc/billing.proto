@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+message RegisterRequest {
+    string name = 1;
+    string country = 2;
+    string city = 3;
+    string currency = 4; // на самом деле здесь нужен енум
+}
+
+message SuccessReply {}
+
+service BillingService {
+    rpc Register (RegisterRequest) returns (SuccessReply) {};
+}

@@ -50,6 +50,19 @@ class Transaction(db.Model):
             or_(Transaction.recipient_user_id == user_id, Transaction.sender_user_id == user_id)).gino.all()
         return sum([t.recipient_value if t.recipient_user_id == user_id else -t.sender_value for t in transactions])
 
+    def to_json_dict(self):
+        return {
+            'id': self.id,
+            'transaction_type': self.transaction_type,
+            'sender_user_id': self.sender_user_id,
+            'sender_currency': self.sender_currency,
+            'sender_value': str(self.sender_value),
+            'recipient_user_id': self.recipient_user_id,
+            'recipient_currency': self.recipient_currency,
+            'recipient_value': str(self.recipient_value),
+            'timestamp': str(self.timestamp),
+        }
+
 
 class Quote(db.Model):
     """
@@ -74,3 +87,8 @@ def init_db(app):
     db.init_app(app)
 
     app.middlewares.append(db)
+
+
+async def init_engine():
+    engine = await db.set_bind(settings.DB_URL)
+    return engine

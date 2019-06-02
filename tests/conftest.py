@@ -23,4 +23,5 @@ def app_configure(loop):
 
 @pytest.fixture
 def cli(loop, aiohttp_client):
-    return loop.run_until_complete(aiohttp_client(make_app()))
+    app = loop.run_until_complete(make_app(debug_mode=True))
+    return loop.run_until_complete(aiohttp_client(app))

@@ -36,7 +36,7 @@ async def test_money_transfer(cli):
 
     resp = await cli.post('/make_deposit', json={
         'user_id': 1,
-        'value': '300',
+        'value': '300.00',
         'currency': 'CNY'
     })
     assert resp.status < 400

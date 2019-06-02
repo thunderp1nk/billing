@@ -2,8 +2,7 @@ import pytest
 from datetime import datetime
 
 
-@pytest.mark.quote
-@pytest.mark.reg
+@pytest.mark.dep
 async def test_make_deposit(cli):
     resp = await cli.post('/register', json={
         'name': 'johndoe',
@@ -30,6 +29,13 @@ async def test_make_deposit(cli):
     resp = await cli.post('/make_deposit', json={
         'user_id': 1,
         'value': '300',
+        'currency': 'CNY'
+    })
+    assert resp.status == 400
+
+    resp = await cli.post('/make_deposit', json={
+        'user_id': 1,
+        'value': '300.00',
         'currency': 'CNY'
     })
     assert resp.status < 400

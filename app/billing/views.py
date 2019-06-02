@@ -4,83 +4,58 @@ from aiohttp import web
 from decimal import Decimal
 
 from app.billing.service_layers import Register, QuotesUpload, MakeDeposit, MoneyTransfer, Report
-from app.billing.types import CurrencyType, AllCurrencyType
-from app.utils import check_required_args
+from core.aiohttp import dataclass_connector
 
 
-async def register(request):
-    json_response = await request.json()
-    try:
-        check_required_args(json_response, Register)
-        await Register(
-            name=json_response['name'],
-            city=json_response['city'],
-            country=json_response['country'],
-            currency=AllCurrencyType(json_response['currency']),
-        ).execute(request['connection'])
-    except Exception:
-        return web.Response(status=400)
+@dataclass_connector(Register)
+async def register(request, json_data, dataclass):
+    await dataclass(
+        name=json_data['name'],
+        city=json_data['city'],
+        country=json_data['country'],
+        currency=json_data['currency'],
+    ).execute(request['connection'])
     return web.json_response(status=201)
 
 
-async def make_deposit(request):
-    json_response = await request.json()
-
-    try:
-        check_required_args(json_response, MakeDeposit)
-        await MakeDeposit(
-            user_id=json_response['user_id'],
-            currency=AllCurrencyType(json_response['currency']),
-            value=Decimal(json_response['value']),
-        ).execute(request['connection'])
-    except Exception:
-        return web.Response(status=400)
+@dataclass_connector(MakeDeposit)
+async def make_deposit(request, json_data, dataclass):
+    await dataclass(
+        user_id=json_data['user_id'],
+        currency=json_data['currency'],
+        value=Decimal(json_data['value']),
+    ).execute(request['connection'], redis=request.app['redis'])
     return web.json_response(status=201)
 
 
-async def money_transfer(request):
-    json_response = await request.json()
-
-    try:
-        check_required_args(json_response, MoneyTransfer)
-        await MoneyTransfer(
-            sender_user_id=json_response['sender_user_id'],
-            sender_currency=AllCurrencyType(json_response['sender_currency']),
-            sender_value=Decimal(json_response['sender_value']),
-            recipient_user_id=json_response['recipient_user_id'],
-        ).execute(request['connection'])
-    except Exception:
-        return web.Response(status=400)
+@dataclass_connector(MoneyTransfer)
+async def money_transfer(request, json_data, dataclass):
+    await dataclass(
+        sender_user_id=json_data['sender_user_id'],
+        sender_currency=json_data['sender_currency'],
+        sender_value=Decimal(json_data['sender_value']),
+        recipient_user_id=json_data['recipient_user_id'],
+    ).execute(request['connection'], redis=request.app['redis'])
     return web.json_response(status=201)
 
 
-async def quotes_upload(request):
-    json_response = await request.json()
-
-    try:
-        check_required_args(json_response, QuotesUpload)
-        await QuotesUpload(
-            date=datetime.strptime(json_response['date'], '%Y-%m-%d'),
-            currency=CurrencyType(json_response['currency']),
-            quote=Decimal(json_response['quote']),
-        ).execute(request['connection'])
-    except Exception:
-        return web.Response(status=400)
+@dataclass_connector(QuotesUpload)
+async def quotes_upload(request, json_data, dataclass):
+    await dataclass(
+        date=datetime.strptime(json_data['date'], '%Y-%m-%d'),
+        currency=json_data['currency'],
+        quote=Decimal(json_data['quote']),
+    ).execute(request['connection'], redis=request.app['redis'])
     return web.json_response(status=201)
 
 
-async def report(request):
-    json_response = await request.json()
-
-    try:
-        check_required_args(json_response, Report)
-        await Report(
-            user_name=json_response['user_name'],
-            start_date=datetime.strptime(
-                json_response['start_date'], '%Y-%m-%d') if json_response.get('start_date') else None,
-            end_date=datetime.strptime(
-                json_response['end_date'], '%Y-%m-%d') if json_response.get('end_date') else None,
-        ).execute(request['connection'])
-    except Exception:
-        return web.Response(status=400)
-    return web.json_response(status=200)
+@dataclass_connector(Report)
+async def report(request, json_data, dataclass):
+    instances = await dataclass(
+        user_name=json_data['user_name'],
+        start_date=datetime.strptime(
+            json_data['start_date'], '%Y-%m-%d') if json_data.get('start_date') else None,
+        end_date=datetime.strptime(
+            json_data['end_date'], '%Y-%m-%d') if json_data.get('end_date') else None,
+    ).execute(request['connection'])
+    return web.json_response(data=[x.to_json_dict() for x in instances], status=200)

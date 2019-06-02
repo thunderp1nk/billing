@@ -2,7 +2,7 @@ import pytest
 from datetime import datetime
 
 
-@pytest.mark.transfer
+@pytest.mark.rep
 async def test_report(cli):
     resp = await cli.post('/register', json={
         'name': 'johndoe',
@@ -36,7 +36,7 @@ async def test_report(cli):
 
     resp = await cli.post('/make_deposit', json={
         'user_id': 1,
-        'value': '300',
+        'value': '300.00',
         'currency': 'CNY'
     })
     assert resp.status < 400
@@ -61,7 +61,7 @@ async def test_report(cli):
         'user_name': 'johndoe',
         'start_date': datetime.utcnow().strftime('%Y-%m-%d'),
     })
-    assert resp.status < 400
+    assert resp.status < 400, await resp.json()
 
     resp = await cli.post('/report', json={
         'user_name': 'johndoe',

@@ -9,14 +9,14 @@ async def test_register(cli):
         'city': 'Limassol',
         'currency': 'USD',
     })
-    assert resp.status >= 400
+    assert resp.status == 400
 
     resp = await cli.post('/register', json={
         'country': 'Cyprus',
         'city': 'Limassol',
         'currency': 'USD',
     })
-    assert resp.status >= 400
+    assert resp.status == 400
 
     resp = await cli.post('/register', json={
         'name': 'johndoe',
@@ -24,7 +24,7 @@ async def test_register(cli):
         'city': 'Limassol',
         'currency': 'RU',
     })
-    assert resp.status >= 400
+    assert resp.status == 400
 
     resp = await cli.post('/register', json={
         'name': 'johndoe',
@@ -40,4 +40,4 @@ async def test_register(cli):
         'city': 'Limassol',
         'currency': 'USD',
     })
-    assert resp.status >= 400
+    assert resp.status == 400

@@ -1,4 +1,8 @@
 aiohttp==3.5.4
+aioredis==1.2.0
 pytest==4.5.0
 pytest-aiohttp==0.3.0
 gino==0.8.2
+grpcio==1.21.1
+grpcio-tools==1.21.1
+grpclib==0.3.0rc3
